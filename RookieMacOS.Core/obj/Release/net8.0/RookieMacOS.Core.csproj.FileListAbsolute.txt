@@ -1,0 +1,12 @@
+/Users/isaac/Downloads/RookieMacOS-fixed/RookieMacOS/RookieMacOS.Core/bin/Release/net8.0/RookieMacOS.Core.deps.json
+/Users/isaac/Downloads/RookieMacOS-fixed/RookieMacOS/RookieMacOS.Core/bin/Release/net8.0/RookieMacOS.Core.dll
+/Users/isaac/Downloads/RookieMacOS-fixed/RookieMacOS/RookieMacOS.Core/bin/Release/net8.0/RookieMacOS.Core.pdb
+/Users/isaac/Downloads/RookieMacOS-fixed/RookieMacOS/RookieMacOS.Core/obj/Release/net8.0/RookieMacOS.Core.csproj.AssemblyReference.cache
+/Users/isaac/Downloads/RookieMacOS-fixed/RookieMacOS/RookieMacOS.Core/obj/Release/net8.0/RookieMacOS.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Users/isaac/Downloads/RookieMacOS-fixed/RookieMacOS/RookieMacOS.Core/obj/Release/net8.0/RookieMacOS.Core.AssemblyInfoInputs.cache
+/Users/isaac/Downloads/RookieMacOS-fixed/RookieMacOS/RookieMacOS.Core/obj/Release/net8.0/RookieMacOS.Core.AssemblyInfo.cs
+/Users/isaac/Downloads/RookieMacOS-fixed/RookieMacOS/RookieMacOS.Core/obj/Release/net8.0/RookieMacOS.Core.csproj.CoreCompileInputs.cache
+/Users/isaac/Downloads/RookieMacOS-fixed/RookieMacOS/RookieMacOS.Core/obj/Release/net8.0/RookieMacOS.Core.dll
+/Users/isaac/Downloads/RookieMacOS-fixed/RookieMacOS/RookieMacOS.Core/obj/Release/net8.0/refint/RookieMacOS.Core.dll
+/Users/isaac/Downloads/RookieMacOS-fixed/RookieMacOS/RookieMacOS.Core/obj/Release/net8.0/RookieMacOS.Core.pdb
+/Users/isaac/Downloads/RookieMacOS-fixed/RookieMacOS/RookieMacOS.Core/obj/Release/net8.0/ref/RookieMacOS.Core.dll

@@ -1,0 +1,23 @@
+Unhandled exception. System.InvalidOperationException: Collection was modified; enumeration operation may not execute.
+   at System.Collections.Generic.List`1.Enumerator.MoveNext()
+   at Avalonia.Controls.Presenters.PanelContainerGenerator.<OnItemsChanged>g__Add|5_0(Int32 index, IEnumerable items, <>c__DisplayClass5_0&)
+   at Avalonia.Controls.Presenters.PanelContainerGenerator.OnItemsChanged(Object sender, NotifyCollectionChangedEventArgs e)
+   at Avalonia.Controls.ItemsSourceView.Avalonia.Controls.Utils.ICollectionChangedListener.PostChanged(INotifyCollectionChanged sender, NotifyCollectionChangedEventArgs e)
+   at Avalonia.Controls.Utils.CollectionChangedEventManager.Entry.<Avalonia.Utilities.IWeakEventSubscriber<System.Collections.Specialized.NotifyCollectionChangedEventArgs>.OnEvent>g__Notify|6_0(INotifyCollectionChanged incc, NotifyCollectionChangedEventArgs args, WeakReference`1[] listeners)
+   at Avalonia.Controls.Utils.CollectionChangedEventManager.Entry.<>c__DisplayClass6_0.<Avalonia.Utilities.IWeakEventSubscriber<System.Collections.Specialized.NotifyCollectionChangedEventArgs>.OnEvent>b__1()
+   at Avalonia.Threading.DispatcherOperation.InvokeCore()
+   at Avalonia.Threading.DispatcherOperation.Execute()
+   at Avalonia.Threading.Dispatcher.ExecuteJob(DispatcherOperation job)
+   at Avalonia.Threading.Dispatcher.ExecuteJobsCore(Boolean fromExplicitBackgroundProcessingCallback)
+   at Avalonia.Threading.Dispatcher.Signaled()
+   at Avalonia.Native.DispatcherImpl.Events.Signaled()
+   at Avalonia.Native.Interop.Impl.__MicroComIAvnPlatformThreadingInterfaceEventsVTable.Signaled(Void* this)
+--- End of stack trace from previous location ---
+   at Avalonia.Native.DispatcherImpl.RunLoop(CancellationToken token)
+   at Avalonia.Threading.DispatcherFrame.Run(IControlledDispatcherImpl impl)
+   at Avalonia.Threading.Dispatcher.PushFrame(DispatcherFrame frame)
+   at Avalonia.Threading.Dispatcher.MainLoop(CancellationToken cancellationToken)
+   at Avalonia.Controls.ApplicationLifetimes.ClassicDesktopStyleApplicationLifetime.StartCore(String[] args)
+   at Avalonia.Controls.ApplicationLifetimes.ClassicDesktopStyleApplicationLifetime.Start(String[] args)
+   at Avalonia.ClassicDesktopStyleApplicationLifetimeExtensions.StartWithClassicDesktopLifetime(AppBuilder builder, String[] args, Action`1 lifetimeBuilder)
+   at RookieMacOS.UI.Program.Main(String[] args) in /Users/isaac/Downloads/RookieMacOS-fixed/RookieMacOS/RookieMacOS.UI/Program.cs:line 9

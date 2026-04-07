@@ -1,0 +1,655 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:RookieMacOS.UI.ViewModels"
+        xmlns:models="using:RookieMacOS.Core.Models"
+        xmlns:converters="using:RookieMacOS.UI.Converters"
+        x:Class="RookieMacOS.UI.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="Sideloader"
+        Width="960" Height="680"
+        MinWidth="800" MinHeight="560"
+        Background="#080c18"
+        TransparencyLevelHint="AcrylicBlur"
+        ExtendClientAreaToDecorationsHint="False"
+        SystemDecorations="Full">
+
+  <Window.Resources>
+    <!-- Colors -->
+    <SolidColorBrush x:Key="GlassBg"        Color="#1AFFFFFF"/>
+    <SolidColorBrush x:Key="GlassDark"      Color="#33000000"/>
+    <SolidColorBrush x:Key="GlassBorder"    Color="#44FFFFFF"/>
+    <SolidColorBrush x:Key="TextPrimary"    Color="#EBF0FF"/>
+    <SolidColorBrush x:Key="TextSecondary"  Color="#80FFFFFF"/>
+    <SolidColorBrush x:Key="TextMuted"      Color="#44FFFFFF"/>
+    <SolidColorBrush x:Key="AccentBlue"     Color="#78C8FF"/>
+    <SolidColorBrush x:Key="AccentGreen"    Color="#34D399"/>
+    <SolidColorBrush x:Key="AccentRed"      Color="#F87171"/>
+    <SolidColorBrush x:Key="AccentAmber"    Color="#FBBF24"/>
+
+
+    <!-- Converters -->
+    <converters:DeviceStatusToColorConverter  x:Key="DeviceStatusToColorConverter"/>
+    <converters:BatteryToColorConverter       x:Key="BatteryToColorConverter"/>
+    <converters:InstallStatusToLabelConverter x:Key="InstallStatusToLabelConverter"/>
+    <converters:InstallStatusToColorConverter x:Key="InstallStatusToColorConverter"/>
+    <converters:IsQueuedConverter             x:Key="IsQueuedConverter"/>
+    <converters:LogLevelToColorConverter      x:Key="LogLevelToColorConverter"/>
+    <converters:LogLevelToTextColorConverter  x:Key="LogLevelToTextColorConverter"/>
+
+    <!-- Glass panel style -->
+    <ControlTheme x:Key="GlassPanel" TargetType="Border">
+      <Setter Property="Background"   Value="{StaticResource GlassBg}"/>
+      <Setter Property="BorderBrush"  Value="{StaticResource GlassBorder}"/>
+      <Setter Property="BorderThickness" Value="0.5"/>
+      <Setter Property="CornerRadius" Value="16"/>
+    </ControlTheme>
+
+    <!-- Glass button style -->
+    <ControlTheme x:Key="GlassButton" TargetType="Button">
+      <Setter Property="Background"         Value="#22FFFFFF"/>
+      <Setter Property="BorderBrush"        Value="#44FFFFFF"/>
+      <Setter Property="BorderThickness"    Value="0.5"/>
+      <Setter Property="CornerRadius"       Value="10"/>
+      <Setter Property="Padding"            Value="14,7"/>
+      <Setter Property="Foreground"         Value="{StaticResource TextPrimary}"/>
+      <Setter Property="FontFamily"         Value="Inter,-apple-system,SF Pro Display"/>
+      <Setter Property="FontSize"           Value="13"/>
+      <Setter Property="FontWeight"         Value="Medium"/>
+      <Setter Property="Cursor"            Value="Hand"/>
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}"
+                              Foreground="{TemplateBinding Foreground}"
+                              FontSize="{TemplateBinding FontSize}"
+                              FontWeight="{TemplateBinding FontWeight}"/>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:pointerover /template/ Border">
+        <Setter Property="Background" Value="#33FFFFFF"/>
+      </Style>
+      <Style Selector="^:pressed /template/ Border">
+        <Setter Property="Background" Value="#18FFFFFF"/>
+      </Style>
+      <Style Selector="^:disabled /template/ Border">
+        <Setter Property="Opacity" Value="0.4"/>
+      </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource GlassButton}">
+      <Setter Property="Background"  Value="#1E78C8FF"/>
+      <Setter Property="BorderBrush" Value="#4478C8FF"/>
+      <Setter Property="Foreground"  Value="{StaticResource AccentBlue}"/>
+      <Style Selector="^:pointerover /template/ Border">
+        <Setter Property="Background" Value="#3378C8FF"/>
+      </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource GlassButton}">
+      <Setter Property="Background"  Value="#1EF87171"/>
+      <Setter Property="BorderBrush" Value="#44F87171"/>
+      <Setter Property="Foreground"  Value="{StaticResource AccentRed}"/>
+    </ControlTheme>
+
+    <!-- Glass TextBox -->
+    <ControlTheme x:Key="GlassInput" TargetType="TextBox">
+      <Setter Property="Background"        Value="#33000000"/>
+      <Setter Property="BorderBrush"       Value="#33FFFFFF"/>
+      <Setter Property="BorderThickness"   Value="0.5"/>
+      <Setter Property="CornerRadius"      Value="10"/>
+      <Setter Property="Padding"           Value="12,8"/>
+      <Setter Property="Foreground"        Value="{StaticResource TextPrimary}"/>
+      <Setter Property="CaretBrush"        Value="{StaticResource AccentBlue}"/>
+      <Setter Property="FontSize"          Value="13"/>
+      <Setter Property="SelectionBrush"    Value="#4478C8FF"/>
+      <Style Selector="^:focus /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="#6678C8FF"/>
+      </Style>
+    </ControlTheme>
+
+    <!-- Nav item -->
+    <ControlTheme x:Key="NavItem" TargetType="Button">
+      <Setter Property="Background"      Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding"         Value="10,7"/>
+      <Setter Property="Foreground"      Value="#80FFFFFF"/>
+      <Setter Property="FontSize"        Value="13"/>
+      <Setter Property="HorizontalContentAlignment" Value="Left"/>
+      <Setter Property="Cursor"          Value="Hand"/>
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}"
+                  CornerRadius="10"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="Center"/>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:pointerover /template/ Border">
+        <Setter Property="Background" Value="#14FFFFFF"/>
+      </Style>
+    </ControlTheme>
+  </Window.Resources>
+
+  <Window.Styles>
+    <Style Selector="TextBlock.h1">
+      <Setter Property="FontSize"   Value="17"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+    </Style>
+    <Style Selector="TextBlock.sub">
+      <Setter Property="FontSize"   Value="12"/>
+      <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+    </Style>
+    <Style Selector="TextBlock.muted">
+      <Setter Property="FontSize"   Value="11"/>
+      <Setter Property="Foreground" Value="{StaticResource TextMuted}"/>
+    </Style>
+    <Style Selector="TextBlock.mono">
+      <Setter Property="FontFamily" Value="SF Mono,Menlo,Consolas,monospace"/>
+      <Setter Property="FontSize"   Value="11"/>
+    </Style>
+    <Style Selector="TextBlock.label">
+      <Setter Property="FontSize"   Value="10"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Foreground" Value="#44FFFFFF"/>
+      <Setter Property="LetterSpacing" Value="1.5"/>
+    </Style>
+  </Window.Styles>
+
+  <!-- Root grid -->
+  <Grid>
+
+    <!-- Background blobs -->
+    <Canvas IsHitTestVisible="False">
+      <Ellipse Canvas.Left="-100" Canvas.Top="-150" Width="700" Height="700"
+               Fill="#4D2864DC" IsHitTestVisible="False">
+        <Ellipse.Effect>
+          <BlurEffect Radius="80"/>
+        </Ellipse.Effect>
+      </Ellipse>
+      <Ellipse Canvas.Right="-100" Canvas.Top="50" Width="550" Height="550"
+               Fill="#3D6E32DC" IsHitTestVisible="False">
+        <Ellipse.Effect>
+          <BlurEffect Radius="60"/>
+        </Ellipse.Effect>
+      </Ellipse>
+      <Ellipse Canvas.Bottom="0" Canvas.Left="350" Width="450" Height="450"
+               Fill="#330A8C6E" IsHitTestVisible="False">
+        <Ellipse.Effect>
+          <BlurEffect Radius="60"/>
+        </Ellipse.Effect>
+      </Ellipse>
+    </Canvas>
+
+    <!-- Main window glass card -->
+    <Border Margin="20" Theme="{StaticResource GlassPanel}"
+            BoxShadow="0 12 40 0 #47000000, 0 2 8 0 #28000000">
+
+      <Grid RowDefinitions="*">
+<!-- ── Body ──────────────────────────────────────────────── -->
+        <Grid Grid.Row="0" ColumnDefinitions="210,*">
+
+          <!-- ── Sidebar ──────────────────────────────────────────── -->
+          <Border Grid.Column="0"
+                  Background="#14000000"
+                  BorderBrush="#18FFFFFF"
+                  BorderThickness="0,0,0.5,0"
+                  Padding="10,14">
+            <StackPanel Spacing="2">
+
+              <!-- Nav label -->
+              <TextBlock Text="SIDELOADER" Classes="label" Margin="10,2,0,8"/>
+
+              <!-- Nav buttons -->
+              <Button Theme="{StaticResource NavItem}" Command="{Binding SelectTabCommand}" CommandParameter="install">
+                <StackPanel Orientation="Horizontal" Spacing="9">
+                  <PathIcon Data="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
+                            Width="15" Height="15" Foreground="#80FFFFFF"/>
+                  <TextBlock Text="Install" VerticalAlignment="Center"/>
+                </StackPanel>
+              </Button>
+
+              <Button Theme="{StaticResource NavItem}" Command="{Binding SelectTabCommand}" CommandParameter="apps">
+                <StackPanel Orientation="Horizontal" Spacing="9">
+                  <PathIcon Data="M3 3h7v7H3V3zm11 0h7v7h-7V3zM3 14h7v7H3v-7zm11 7v-7h7v7h-7z"
+                            Width="15" Height="15" Foreground="#80FFFFFF"/>
+                  <TextBlock Text="Apps" VerticalAlignment="Center"/>
+                </StackPanel>
+              </Button>
+
+              <Button Theme="{StaticResource NavItem}" Command="{Binding SelectTabCommand}" CommandParameter="wireless">
+                <StackPanel Orientation="Horizontal" Spacing="9">
+                  <PathIcon Data="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"
+                            Width="15" Height="15" Foreground="#80FFFFFF"/>
+                  <TextBlock Text="Wireless" VerticalAlignment="Center"/>
+                </StackPanel>
+              </Button>
+
+              <Button Theme="{StaticResource NavItem}" Command="{Binding SelectTabCommand}" CommandParameter="terminal">
+                <StackPanel Orientation="Horizontal" Spacing="9">
+                  <PathIcon Data="M4 17l6-6-6-6M12 19h8"
+                            Width="15" Height="15" Foreground="#80FFFFFF"/>
+                  <TextBlock Text="Terminal" VerticalAlignment="Center"/>
+                </StackPanel>
+              </Button>
+
+              <Button Theme="{StaticResource NavItem}" Command="{Binding SelectTabCommand}" CommandParameter="logs">
+                <StackPanel Orientation="Horizontal" Spacing="9">
+                  <PathIcon Data="M12 8v4l3 3M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"
+                            Width="15" Height="15" Foreground="#80FFFFFF"/>
+                  <TextBlock Text="Logs" VerticalAlignment="Center"/>
+                  <!-- Error badge -->
+                  <Border Background="#33F87171" BorderBrush="#44F87171" BorderThickness="0.5"
+                          CornerRadius="10" Padding="5,1"
+                          IsVisible="{Binding ErrorCount, Converter={x:Static converters:ConverterValueConverters.IsGreaterThan}, ConverterParameter=0}">
+                    <TextBlock Text="{Binding ErrorCount}" FontSize="10" FontWeight="SemiBold"
+                               Foreground="{StaticResource AccentRed}"/>
+                  </Border>
+                </StackPanel>
+              </Button>
+
+              <Button Theme="{StaticResource NavItem}" Command="{Binding SelectTabCommand}" CommandParameter="settings">
+                <StackPanel Orientation="Horizontal" Spacing="9">
+                  <PathIcon Data="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" Width="15" Height="15" Foreground="#80FFFFFF"/>
+                  <TextBlock Text="Settings" VerticalAlignment="Center"/>
+</StackPanel>
+              </Button>
+
+              <!-- Devices section -->
+              <Separator Margin="0,14,0,12" Background="#12FFFFFF"/>
+              <Grid ColumnDefinitions="*,Auto" Margin="10,0,10,8">
+                <TextBlock Grid.Column="0" Text="DEVICES" Classes="label" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" Theme="{StaticResource NavItem}"
+                        Command="{Binding ScanDevicesCommand}" Padding="4">
+                  <PathIcon Data="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+                            Width="13" Height="13" Foreground="#66FFFFFF"/>
+                </Button>
+              </Grid>
+
+              <!-- Device list -->
+              <ItemsControl ItemsSource="{Binding Devices}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="models:DeviceInfo">
+                    <Button Theme="{StaticResource NavItem}" Padding="8,7"
+                            Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).SelectDeviceCommand}"
+                            CommandParameter="{Binding}">
+                      <Grid ColumnDefinitions="Auto,*,Auto">
+                        <Ellipse Grid.Column="0" Width="5" Height="5" Margin="0,0,8,0"
+                                 Fill="{Binding Status, Converter={StaticResource DeviceStatusToColorConverter}}"/>
+                        <StackPanel Grid.Column="1">
+                          <TextBlock Text="{Binding DisplayName}" FontSize="12" FontWeight="Medium"
+                                     Foreground="#D0FFFFFF" TextTrimming="CharacterEllipsis"/>
+                          <TextBlock Text="{Binding TypeLabel}" Classes="muted" FontSize="10"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="2" FontSize="11" FontFamily="monospace"
+                                   Foreground="{Binding BatteryLevel, Converter={StaticResource BatteryToColorConverter}}"
+                                   Text="{Binding BatteryLevel, StringFormat='{}{0}%'}"/>
+                      </Grid>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <!-- Selected device card -->
+              <Border Background="#18000000" BorderBrush="#18FFFFFF" BorderThickness="0.5"
+                      CornerRadius="13" Padding="12,10" Margin="0,8,0,0"
+                      IsVisible="{Binding SelectedDevice, Converter={x:Static converters:ObjectConverters.IsNotNull}}">
+                <StackPanel Spacing="5">
+                  <TextBlock Text="SELECTED" Classes="label" Margin="0,0,0,3"/>
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="Model"  Classes="muted" FontSize="11"/>
+                    <TextBlock Grid.Column="1" Text="{Binding SelectedDevice.DisplayName}"
+                               Classes="mono" Foreground="#A0FFFFFF" FontSize="11"/>
+                  </Grid>
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="Serial" Classes="muted" FontSize="11"/>
+                    <TextBlock Grid.Column="1" Text="{Binding SelectedDevice.Serial}"
+                               Classes="mono" Foreground="#A0FFFFFF" FontSize="11"
+                               TextTrimming="CharacterEllipsis" MaxWidth="100"/>
+                  </Grid>
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="Android" Classes="muted" FontSize="11"/>
+                    <TextBlock Grid.Column="1" Text="{Binding SelectedDevice.AndroidVersion}"
+                               Classes="mono" Foreground="#A0FFFFFF" FontSize="11"/>
+                  </Grid>
+
+                  <!-- Quest developer mode note -->
+                  <Border Background="#1AFBBF24" BorderBrush="#33FBBF24" BorderThickness="0.5"
+                          CornerRadius="8" Padding="8,5" Margin="0,4,0,0"
+                          IsVisible="{Binding SelectedDevice.RequiresDeveloperModeNote}">
+                    <TextBlock Text="Enable developer mode in the Meta mobile app"
+                               FontSize="10" TextWrapping="Wrap"
+                               Foreground="{StaticResource AccentAmber}"/>
+                  </Border>
+
+                  <!-- Actions -->
+                  <Grid ColumnDefinitions="*,*,*" Margin="0,6,0,0">
+                    <Button Grid.Column="0" Theme="{StaticResource GlassButton}"
+                            Command="{Binding RebootDeviceCommand}" CommandParameter=""
+                            Padding="0,5" HorizontalAlignment="Stretch" FontSize="11">Reboot</Button>
+                    <Button Grid.Column="1" Theme="{StaticResource GlassButton}"
+                            Command="{Binding RebootDeviceCommand}" CommandParameter="recovery"
+                            Padding="0,5" HorizontalAlignment="Stretch" FontSize="11" Margin="4,0">Recov.</Button>
+                    <Button Grid.Column="2" Theme="{StaticResource DangerButton}"
+                            Command="{Binding RebootDeviceCommand}" CommandParameter="bootloader"
+                            Padding="0,5" HorizontalAlignment="Stretch" FontSize="11">BL</Button>
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+            </StackPanel>
+          </Border>
+
+          <!-- ── Main content area ─────────────────────────────── -->
+          <ScrollViewer Grid.Column="1" Padding="20,22">
+            <StackPanel Spacing="0">
+
+            <!-- Install tab -->
+            <StackPanel Spacing="12"
+                        IsVisible="{Binding SelectedTab, Converter={x:Static converters:StringConverters.IsEqual}, ConverterParameter=install}">
+
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0">
+                  <TextBlock Text="Install APKs" Classes="h1"/>
+                  <TextBlock Classes="sub" Margin="0,3,0,0"
+                             Text="{Binding SelectedDevice.DisplayName, StringFormat='→ {0}', FallbackValue='⚠ No device selected'}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                  <Button Theme="{StaticResource GlassButton}"
+                          Command="{Binding ClearCompletedCommand}" FontSize="12" Padding="12,6">Clear done</Button>
+                  <Button Theme="{StaticResource AccentButton}"
+                          Command="{Binding InstallAllCommand}"
+                          IsEnabled="{Binding InstallJobs.Count, Converter={x:Static converters:ConverterValueConverters.IsGreaterThan}, ConverterParameter=0}"
+                          Padding="16,7">
+                    <TextBlock Text="{Binding InstallJobs.Count, StringFormat='Install all ({0})'}"/>
+                  </Button>
+                </StackPanel>
+              </Grid>
+
+              <!-- Drop zone -->
+              <Border Background="#08FFFFFF" BorderBrush="#26FFFFFF" BorderThickness="1"
+                      CornerRadius="16" Padding="20,26" DragDrop.AllowDrop="True"
+                      Name="DropZone">
+                <StackPanel HorizontalAlignment="Center" Spacing="8">
+                  <PathIcon Data="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
+                            Width="28" Height="28" Foreground="#38FFFFFF"/>
+                  <TextBlock Text="Drop APK / XAPK files here" FontSize="13" FontWeight="Medium"
+                             Foreground="#60FFFFFF" HorizontalAlignment="Center"/>
+                  <TextBlock Text="or click Browse · batch install · duplicates filtered"
+                             FontSize="11" Foreground="#35FFFFFF" HorizontalAlignment="Center"/>
+                  <Button Theme="{StaticResource GlassButton}" HorizontalAlignment="Center"
+                          Command="{Binding BrowseApksCommand}" Margin="0,4,0,0" Padding="14,6" FontSize="12">Browse…</Button>
+                </StackPanel>
+              </Border>
+
+              <!-- Job list -->
+              <ItemsControl ItemsSource="{Binding InstallJobs}"
+                            IsVisible="{Binding InstallJobs.Count, Converter={x:Static converters:ConverterValueConverters.IsGreaterThan}, ConverterParameter=0}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><StackPanel Spacing="6"/></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="models:InstallJob">
+                    <Border Background="#14000000" BorderBrush="#18FFFFFF" BorderThickness="0.5"
+                            CornerRadius="12" Padding="12,10">
+                      <Grid ColumnDefinitions="Auto,*,Auto">
+                        <Border Grid.Column="0" Width="30" Height="30" CornerRadius="8"
+                                Background="#25A085FF" BorderBrush="#38A085FF" BorderThickness="0.5"
+                                Margin="0,0,12,0">
+                          <PathIcon Data="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                                    Width="14" Height="14" Foreground="#A085FF"/>
+                        </Border>
+                        <StackPanel Grid.Column="1">
+                          <TextBlock Text="{Binding FileName}" FontSize="12" FontWeight="Medium"
+                                     Foreground="#E0FFFFFF" TextTrimming="CharacterEllipsis"/>
+                          <TextBlock Text="{Binding FileSizeMb}" Classes="mono muted"/>
+                          <ProgressBar Value="{Binding Progress}" Minimum="0" Maximum="100"
+                                       Height="2" Margin="0,5,0,0" CornerRadius="1"
+                                       IsVisible="{Binding IsRunning}"
+                                       Background="#15FFFFFF" Foreground="#78C8FF"/>
+                          <TextBlock Text="{Binding ErrorMessage}" FontSize="10" FontFamily="monospace"
+                                     Foreground="{StaticResource AccentRed}"
+                                     IsVisible="{Binding ErrorMessage, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6">
+                          <!-- Status indicator -->
+                          <TextBlock FontSize="11" FontFamily="monospace" VerticalAlignment="Center"
+                                     Foreground="{Binding Status, Converter={StaticResource InstallStatusToColorConverter}}"
+                                     Text="{Binding Status, Converter={StaticResource InstallStatusToLabelConverter}}"/>
+                          <!-- Install single -->
+                          <Button Theme="{StaticResource AccentButton}" FontSize="12" Padding="10,4"
+                                  Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).InstallSingleCommand}"
+                                  CommandParameter="{Binding}"
+                                  IsVisible="{Binding Status, Converter={StaticResource IsQueuedConverter}}">Install</Button>
+                          <!-- Remove -->
+                          <Button Theme="{StaticResource NavItem}" Padding="4"
+                                  Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).RemoveJobCommand}"
+                                  CommandParameter="{Binding}">
+                            <PathIcon Data="M18 6L6 18M6 6l12 12" Width="13" Height="13" Foreground="#44FFFFFF"/>
+                          </Button>
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <!-- Install flags -->
+              <Border Background="#14000000" BorderBrush="#18FFFFFF" BorderThickness="0.5"
+                      CornerRadius="16" Padding="14">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="INSTALL FLAGS" Classes="label" Margin="0,0,0,2"/>
+                  <UniformGrid Columns="2" Rows="3">
+                    <CheckBox Content="Allow downgrades (-d)"      IsChecked="{Binding OptDowngrade}"    Foreground="#80FFFFFF" FontSize="12"/>
+                    <CheckBox Content="Keep app data (-k)"         IsChecked="{Binding OptKeepData}"     Foreground="#80FFFFFF" FontSize="12"/>
+                    <CheckBox Content="Grant all permissions (-g)"  IsChecked="{Binding OptGrantPerms}"   Foreground="#80FFFFFF" FontSize="12"/>
+                    <CheckBox Content="Skip verification"           IsChecked="{Binding OptNoVerify}"     Foreground="#80FFFFFF" FontSize="12"/>
+                    <CheckBox Content="Continue on error"           IsChecked="{Binding OptContinueOnError}" Foreground="#80FFFFFF" FontSize="12"/>
+                  </UniformGrid>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+
+            <!-- Apps tab -->
+            <StackPanel Spacing="12"
+                        IsVisible="{Binding SelectedTab, Converter={x:Static converters:StringConverters.IsEqual}, ConverterParameter=apps}">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0">
+                  <TextBlock Text="Installed Apps" Classes="h1"/>
+                  <TextBlock Text="{Binding InstalledPackages.Count, StringFormat='{}{0} packages'}"
+                             Classes="sub" Margin="0,3,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="1" Theme="{StaticResource GlassButton}"
+                        Command="{Binding RefreshPackagesCommand}" FontSize="12" Padding="12,6">Refresh</Button>
+              </Grid>
+
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <TextBox Grid.Column="0" Theme="{StaticResource GlassInput}"
+                         Text="{Binding PackageSearch}" Watermark="Search packages…"/>
+                <CheckBox Grid.Column="1" Content="Show system" IsChecked="{Binding ShowSystemApps}"
+                          Foreground="#80FFFFFF" FontSize="12"/>
+              </Grid>
+
+              <ItemsControl ItemsSource="{Binding InstalledPackages}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><StackPanel/></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:InstalledPackage">
+                    <Border Padding="12,8" Background="Transparent">
+                      <Grid ColumnDefinitions="Auto,*,Auto">
+                        <Border Grid.Column="0" Width="32" Height="32" CornerRadius="9"
+                                Background="#20FFFFFF" BorderBrush="#28FFFFFF" BorderThickness="0.5" Margin="0,0,12,0">
+                          <TextBlock Text="{Binding DisplayName[0]}" FontSize="13" FontWeight="Bold"
+                                     Foreground="#B0FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Grid.Column="1">
+                          <TextBlock Text="{Binding DisplayName}" FontSize="13" FontWeight="Medium" Foreground="#E0FFFFFF"/>
+                          <TextBlock Text="{Binding PackageName}" Classes="mono muted" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                        <Button Grid.Column="2" Theme="{StaticResource DangerButton}" Padding="7,5"
+                                Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).UninstallPackageCommand}"
+                                CommandParameter="{Binding}">
+                          <PathIcon Data="M3 6h18M19 6l-1 14H6L5 6" Width="13" Height="13" Foreground="{StaticResource AccentRed}"/>
+                        </Button>
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+
+            <!-- Wireless tab -->
+            <StackPanel Spacing="12"
+                        IsVisible="{Binding SelectedTab, Converter={x:Static converters:StringConverters.IsEqual}, ConverterParameter=wireless}">
+              <TextBlock Text="Wireless ADB" Classes="h1"/>
+              <TextBlock Text="Connect over TCP/IP on the same network" Classes="sub"/>
+
+              <Border Background="#14000000" BorderBrush="#18FFFFFF" BorderThickness="0.5" CornerRadius="16" Padding="14">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="TCP/IP CONNECT" Classes="label"/>
+                  <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                    <TextBox Grid.Column="0" Theme="{StaticResource GlassInput}"
+                             Text="{Binding WirelessIp}" Watermark="IP address"/>
+                    <TextBox Grid.Column="1" Theme="{StaticResource GlassInput}"
+                             Text="{Binding WirelessPort}" Width="72" TextAlignment="Center"/>
+                    <Button Grid.Column="2" Theme="{StaticResource AccentButton}"
+                            Command="{Binding WirelessConnectCommand}" Padding="14,8">Connect</Button>
+                  </Grid>
+                  <Button Theme="{StaticResource GlassButton}"
+                          Command="{Binding EnableTcpIpCommand}" FontSize="11" Padding="12,5">Enable tcpip on USB device</Button>
+                </StackPanel>
+              </Border>
+
+              <Border Background="#14000000" BorderBrush="#18FFFFFF" BorderThickness="0.5" CornerRadius="16" Padding="14">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="SETUP GUIDE" Classes="label"/>
+                  <ItemsControl>
+                    <ItemsControl.Items>
+                      <TextBlock Text="1. Enable Developer Options — tap Build Number 7×" FontSize="12" Foreground="#70FFFFFF"/>
+                      <TextBlock Text="2. Enable USB Debugging in Developer Options" FontSize="12" Foreground="#70FFFFFF"/>
+                      <TextBlock Text="3. For Quest: enable Developer Mode in the Meta app first" FontSize="12" Foreground="#70FFFFFF"/>
+                      <TextBlock Text="4. Plug in via USB, click 'Enable tcpip' above" FontSize="12" Foreground="#70FFFFFF"/>
+                      <TextBlock Text="5. Find IP in Settings → About → Status / Wi-Fi" FontSize="12" Foreground="#70FFFFFF"/>
+                      <TextBlock Text="6. Unplug USB and connect wirelessly above" FontSize="12" Foreground="#70FFFFFF"/>
+                    </ItemsControl.Items>
+                  </ItemsControl>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+
+            <!-- Terminal tab -->
+            <StackPanel Spacing="12"
+                        IsVisible="{Binding SelectedTab, Converter={x:Static converters:StringConverters.IsEqual}, ConverterParameter=terminal}">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0">
+                  <TextBlock Text="Terminal" Classes="h1"/>
+                  <TextBlock Text="{Binding SelectedDevice.Serial, FallbackValue='No device selected'}"
+                             Classes="sub mono" Margin="0,3,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="1" Theme="{StaticResource GlassButton}"
+                        Command="{Binding ClearShellCommand}" FontSize="12" Padding="12,6">Clear</Button>
+              </Grid>
+
+              <Border Background="#1A000000" BorderBrush="#18FFFFFF" BorderThickness="0.5"
+                      CornerRadius="16" Padding="14" Height="300">
+                <ScrollViewer>
+                  <TextBlock Text="{Binding ShellOutput}" FontFamily="SF Mono,Menlo,Consolas,monospace"
+                             FontSize="12" Foreground="#B0FFFFFF" TextWrapping="Wrap"/>
+                </ScrollViewer>
+              </Border>
+
+              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                <TextBlock Grid.Column="0" Text="$" Foreground="#A085FF"
+                           FontFamily="monospace" FontSize="13" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Theme="{StaticResource GlassInput}"
+                         Text="{Binding ShellInput}" Watermark="adb shell getprop ro.product.model"
+                         FontFamily="SF Mono,Menlo,Consolas,monospace" FontSize="12"/>
+                <Button Grid.Column="2" Theme="{StaticResource AccentButton}"
+                        Command="{Binding RunShellCommand}" Padding="14,8">▶</Button>
+              </Grid>
+            </StackPanel>
+
+            <!-- Logs tab -->
+            <StackPanel Spacing="12"
+                        IsVisible="{Binding SelectedTab, Converter={x:Static converters:StringConverters.IsEqual}, ConverterParameter=logs}">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0">
+                  <TextBlock Text="Activity Log" Classes="h1"/>
+                  <TextBlock Text="{Binding Logs.Count, StringFormat='{}{0} entries'}"
+                             Classes="sub" Margin="0,3,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="1" Theme="{StaticResource DangerButton}"
+                        Command="{Binding ClearLogsCommand}" FontSize="12" Padding="12,6">Clear</Button>
+              </Grid>
+
+              <Border Background="#1A000000" BorderBrush="#18FFFFFF" BorderThickness="0.5"
+                      CornerRadius="16" Padding="14" Height="420">
+                <ScrollViewer>
+                  <ItemsControl ItemsSource="{Binding Logs}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate><StackPanel/></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:LogEntry">
+                        <Grid ColumnDefinitions="Auto,Auto,*" Margin="0,1">
+                          <TextBlock Grid.Column="0" Text="{Binding Time}" Classes="mono muted" Width="70"/>
+                          <TextBlock Grid.Column="1" Text="{Binding Level}" Classes="mono" Width="36"
+                                     Foreground="{Binding Level, Converter={StaticResource LogLevelToColorConverter}}"/>
+                          <TextBlock Grid.Column="2" Text="{Binding Message}" Classes="mono" TextWrapping="Wrap"
+                                     Foreground="{Binding Level, Converter={StaticResource LogLevelToTextColorConverter}}"/>
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+              </Border>
+            </StackPanel>
+
+            <!-- Settings tab -->
+            <StackPanel Spacing="12"
+                        IsVisible="{Binding SelectedTab, Converter={x:Static converters:StringConverters.IsEqual}, ConverterParameter=settings}">
+              <TextBlock Text="Settings" Classes="h1"/>
+
+              <Border Background="#14000000" BorderBrush="#18FFFFFF" BorderThickness="0.5" CornerRadius="16" Padding="14">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="ADB CONFIGURATION" Classes="label"/>
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <TextBox Grid.Column="0" Theme="{StaticResource GlassInput}"
+                             Text="{Binding AdbPath}" FontFamily="SF Mono,Menlo,Consolas,monospace" FontSize="12"/>
+                    <Button Grid.Column="1" Theme="{StaticResource GlassButton}"
+                            Command="{Binding TestAdbCommand}" FontSize="12" Padding="12,8">Test</Button>
+                  </Grid>
+                  <TextBlock Text="Common paths: /usr/local/bin/adb · /opt/homebrew/bin/adb"
+                             FontSize="10" Foreground="#40FFFFFF"/>
+                </StackPanel>
+              </Border>
+
+              <Border Background="#14000000" BorderBrush="#18FFFFFF" BorderThickness="0.5" CornerRadius="16" Padding="14">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="INSTALL DEFAULTS" Classes="label"/>
+                  <CheckBox Content="Allow version downgrades"   IsChecked="{Binding OptDowngrade}"      Foreground="#80FFFFFF" FontSize="13"/>
+                  <CheckBox Content="Keep app data on reinstall" IsChecked="{Binding OptKeepData}"       Foreground="#80FFFFFF" FontSize="13"/>
+                  <CheckBox Content="Grant all permissions"       IsChecked="{Binding OptGrantPerms}"    Foreground="#80FFFFFF" FontSize="13"/>
+                  <CheckBox Content="Skip streaming verification" IsChecked="{Binding OptNoVerify}"      Foreground="#80FFFFFF" FontSize="13"/>
+                  <CheckBox Content="Continue batch on error"     IsChecked="{Binding OptContinueOnError}" Foreground="#80FFFFFF" FontSize="13"/>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>
