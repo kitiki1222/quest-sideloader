@@ -111,3 +111,12 @@ dotnet run --project RookieMacOS.UI
 4. `~/Library/Android/sdk/platform-tools/adb` (Android Studio)
 
 Override in Settings tab if yours is elsewhere.
+
+
+
+
+
+
+
+
+by claude
